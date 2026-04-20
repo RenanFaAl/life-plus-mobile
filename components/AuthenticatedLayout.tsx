@@ -8,6 +8,8 @@ import ProfileScreen from '../screens/ProfileScreen';
 import ExamsScreen from '../screens/ExamsScreen';
 import MedicationsScreen from '../screens/MedicationsScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import MapScreen from '../screens/MapScreen';
+
 
 const Tab = createBottomTabNavigator();
 
@@ -46,6 +48,7 @@ export default function AuthenticatedLayout() {
       <Tab.Screen name="Exams" component={ExamsScreen} options={{ title: 'Exames' }} />
       <Tab.Screen name="Medications" component={MedicationsScreen} options={{ title: 'Medicamentos' }} />
       <Tab.Screen name="Settings" component={SettingsScreen} options={{ title: 'Config' }} />
+      <Tab.Screen name="Mapa" component={MapScreen} options={{ title: 'Mapa' }} />
     </Tab.Navigator>
   );
 }
