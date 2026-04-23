@@ -10,5 +10,5 @@ export default function MapScreen() {
       .then(setFarmacias);
   }, []);
 
-  return <MapComponent farmacias={farmacias} />;
+  return <MapComponent />;
 }

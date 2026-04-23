@@ -1,6 +1,6 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { LayoutDashboard, User, FileText, Pill, Settings } from 'lucide-react-native';
+import { LayoutDashboard, User, FileText, Pill, Settings, Map } from 'lucide-react-native';
 import colors from '../theme/colors';
 
 import DashboardScreen from '../screens/DashboardScreen';
@@ -36,6 +36,7 @@ export default function AuthenticatedLayout() {
             Profile: User,
             Exams: FileText,
             Medications: Pill,
+            Mapa: Map,
             Settings: Settings,
           };
           const Icon = icons[route.name];
@@ -47,8 +48,8 @@ export default function AuthenticatedLayout() {
       <Tab.Screen name="Profile" component={ProfileScreen} options={{ title: 'Perfil' }} />
       <Tab.Screen name="Exams" component={ExamsScreen} options={{ title: 'Exames' }} />
       <Tab.Screen name="Medications" component={MedicationsScreen} options={{ title: 'Medicamentos' }} />
-      <Tab.Screen name="Settings" component={SettingsScreen} options={{ title: 'Config' }} />
       <Tab.Screen name="Mapa" component={MapScreen} options={{ title: 'Mapa' }} />
+      <Tab.Screen name="Settings" component={SettingsScreen} options={{ title: 'Config' }} />
     </Tab.Navigator>
   );
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { Heart, FolderOpen, AlertTriangle, PlayCircle } from 'lucide-react-native';
 import colors from '../theme/colors';
