@@ -1,28 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; 
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
-  KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator,
+  KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator, Alert 
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react-native';
 import colors from '../theme/colors';
+import { useAuth } from '../hooks/useAuth';
 
 export default function LoginScreen({ navigation }: any) {
-  const [showPass, setShowPass] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const { login, loading, message, messageType, closeMessage, loginSuccess } = useAuth();
 
-  const handleLogin = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      navigation.navigate('App');
-    }, 800);
+  const [showPass, setShowPass] = useState(false);
+  
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  useEffect(() => {
+    if (message) {
+      const type = messageType;
+      const msg = message;
+
+      Alert.alert(
+        type === 'success' ? 'Sucesso' : 'Erro',
+        msg,
+        [{ 
+          text: 'OK', 
+          onPress: () => {
+            closeMessage(); 
+          } 
+        }]
+      );      
+    }
+  }, [message]);
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Erro', 'Preencha todos os campos.');
+      return;
+    }
+    
+    await login({ email, password });
   };
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
-        {/* Header gradient */}
         <LinearGradient colors={[colors.gradientStart, colors.gradientEnd]} style={styles.topGradient}>
           <TouchableOpacity style={styles.logoRow} onPress={() => navigation.navigate('Home')}>
             <View style={styles.logoIcon}><Text style={styles.logoIconText}>L+</Text></View>
@@ -31,56 +54,53 @@ export default function LoginScreen({ navigation }: any) {
           <Text style={styles.tagline}>Sua saúde sempre ao alcance das mãos</Text>
         </LinearGradient>
 
-        {/* Form card */}
         <View style={styles.card}>
           <Text style={styles.title}>Bem-vindo de volta</Text>
           <Text style={styles.subtitle}>Entre na sua conta para continuar</Text>
 
-          {/* Email */}
           <Text style={styles.label}>E-mail</Text>
           <View style={styles.inputRow}>
             <Mail size={16} color={colors.textMuted} style={styles.inputIcon} />
-            <TextInput style={styles.input} placeholder="voce@exemplo.com" keyboardType="email-address" autoCapitalize="none" placeholderTextColor={colors.textMuted} />
+            <TextInput 
+              style={styles.input} 
+              placeholder="voce@exemplo.com" 
+              keyboardType="email-address" 
+              autoCapitalize="none" 
+              placeholderTextColor={colors.textMuted}
+              value={email}
+              onChangeText={setEmail} 
+            />
           </View>
 
-          {/* Password */}
           <View style={styles.labelRow}>
             <Text style={styles.label}>Senha</Text>
             <TouchableOpacity><Text style={styles.forgot}>Esqueceu a senha?</Text></TouchableOpacity>
           </View>
           <View style={styles.inputRow}>
             <Lock size={16} color={colors.textMuted} style={styles.inputIcon} />
-            <TextInput style={[styles.input, { flex: 1 }]} placeholder="••••••••" secureTextEntry={!showPass} placeholderTextColor={colors.textMuted} />
+            <TextInput 
+              style={[styles.input, { flex: 1 }]} 
+              placeholder="••••••••" 
+              secureTextEntry={!showPass} 
+              placeholderTextColor={colors.textMuted}
+              value={password}
+              onChangeText={setPassword} 
+            />
             <TouchableOpacity onPress={() => setShowPass(!showPass)} style={styles.eyeBtn}>
               {showPass ? <EyeOff size={16} color={colors.textMuted} /> : <Eye size={16} color={colors.textMuted} />}
             </TouchableOpacity>
           </View>
 
-          {/* Submit */}
-          <TouchableOpacity style={styles.submitBtn} onPress={handleLogin} disabled={loading}>
+          <TouchableOpacity 
+            style={[styles.submitBtn, loading && { opacity: 0.7 }]} 
+            onPress={handleLogin} 
+            disabled={loading}
+          >
             {loading
               ? <ActivityIndicator color={colors.white} />
               : <Text style={styles.submitText}>Entrar</Text>}
           </TouchableOpacity>
 
-          {/* Divider */}
-          <View style={styles.divider}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>ou continue com</Text>
-            <View style={styles.dividerLine} />
-          </View>
-
-          {/* Social */}
-          <View style={styles.socialRow}>
-            <TouchableOpacity style={styles.socialBtn}><Text style={styles.socialText}>Google</Text></TouchableOpacity>
-            <TouchableOpacity style={styles.socialBtn}><Text style={styles.socialText}>Apple</Text></TouchableOpacity>
-          </View>
-
-          {/* Register link */}
-          <Text style={styles.bottomText}>
-            Não tem conta?{' '}
-            <Text style={styles.link} onPress={() => navigation.navigate('Register')}>Criar conta</Text>
-          </Text>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

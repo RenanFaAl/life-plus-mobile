@@ -2,6 +2,11 @@ import 'react-native-gesture-handler';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { ActivityIndicator, View } from 'react-native'; 
+
+import { AuthProvider } from './context/AuthContext';
+import { MedicineProvider } from './context/MedicineContext';
+import { useAuth } from './hooks/useAuth'; 
 
 import HomeScreen from './screens/HomeScreen';
 import LoginScreen from './screens/LoginScreen';
@@ -10,15 +15,40 @@ import AuthenticatedLayout from './components/AuthenticatedLayout';
 
 const Stack = createNativeStackNavigator();
 
+function RootNavigator() {
+  const { token, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#0891b2" />
+      </View>
+    );
+  }
+
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      {!token ? (
+        <Stack.Group>
+          <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="Register" component={RegisterScreen} />
+        </Stack.Group>
+      ) : (
+        <Stack.Screen name="App" component={AuthenticatedLayout} />
+      )}
+    </Stack.Navigator>
+  );
+}
+
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Register" component={RegisterScreen} />
-        <Stack.Screen name="App" component={AuthenticatedLayout} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <AuthProvider>
+      <MedicineProvider>
+        <NavigationContainer>
+          <RootNavigator />
+        </NavigationContainer>
+      </MedicineProvider>
+    </AuthProvider>
   );
 }

@@ -1,19 +1,80 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
-  KeyboardAvoidingView, Platform, ScrollView,
+  KeyboardAvoidingView, Platform, ScrollView, Alert, ActivityIndicator
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Mail, Lock, Eye, EyeOff, User, Calendar } from 'lucide-react-native';
+import { Mail, Lock, Eye, EyeOff, User, Calendar as CalendarIcon } from 'lucide-react-native';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import colors from '../theme/colors';
+import { useAuth } from '../hooks/useAuth';
 
 export default function RegisterScreen({ navigation }: any) {
+  const { register, loading, message, messageType, closeMessage } = useAuth();
+
   const [showPass, setShowPass] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  const [dob, setDob] = useState('');
+  
+  const [date, setDate] = useState(new Date());
+  const [showPicker, setShowPicker] = useState(false);
+  const [dateLabel, setDateLabel] = useState('Selecionar data');
+
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    birthDate: ''
+  });
+
+  useEffect(() => {
+    if (message) {
+      Alert.alert(
+        messageType === 'success' ? 'Sucesso' : 'Erro',
+        message,
+        [{ text: 'OK', onPress: () => {
+          closeMessage();
+          if (messageType === 'success') navigation.navigate('Login');
+        }}]
+      );
+    }
+  }, [message]);
+
+  const onChangeDate = (event: DateTimePickerEvent, selectedDate?: Date) => {
+    if (Platform.OS === 'android') setShowPicker(false);
+
+    if (selectedDate) {
+      setDate(selectedDate);
+      
+      const visualDate = selectedDate.toLocaleDateString('pt-BR');
+      setDateLabel(visualDate);
+
+      const year = selectedDate.getFullYear();
+      const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+      const day = String(selectedDate.getDate()).padStart(2, '0');
+      const apiDate = `${year}-${month}-${day}`;
+      
+      setForm({ ...form, birthDate: apiDate });
+    }
+  };
+
+  const handleRegister = async () => {
+    if (!form.name || !form.email || !form.password || !form.birthDate) {
+      Alert.alert('Erro', 'Por favor, preencha todos os campos.');
+      return;
+    }
+    if (form.password !== form.confirmPassword) {
+      Alert.alert('Erro', 'As senhas não coincidem.');
+      return;
+    }
+    await register(form);
+  };
 
   return (
-    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView 
+      style={styles.container} 
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
         <LinearGradient colors={[colors.gradientEnd, colors.gradientStart]} style={styles.topGradient}>
           <TouchableOpacity style={styles.logoRow} onPress={() => navigation.navigate('Home')}>
@@ -27,57 +88,91 @@ export default function RegisterScreen({ navigation }: any) {
           <Text style={styles.title}>Criar conta</Text>
           <Text style={styles.subtitle}>Preencha seus dados para começar</Text>
 
-          {/* Nome */}
           <Text style={styles.label}>Nome completo</Text>
           <View style={styles.inputRow}>
             <User size={16} color={colors.textMuted} style={styles.inputIcon} />
-            <TextInput style={styles.input} placeholder="João Silva" placeholderTextColor={colors.textMuted} />
+            <TextInput 
+              style={styles.input} 
+              placeholder="João Silva" 
+              placeholderTextColor={colors.textMuted}
+              value={form.name}
+              onChangeText={(txt) => setForm({...form, name: txt})}
+            />
           </View>
 
-          {/* Email */}
           <Text style={styles.label}>E-mail</Text>
           <View style={styles.inputRow}>
             <Mail size={16} color={colors.textMuted} style={styles.inputIcon} />
-            <TextInput style={styles.input} placeholder="voce@exemplo.com" keyboardType="email-address" autoCapitalize="none" placeholderTextColor={colors.textMuted} />
+            <TextInput 
+              style={styles.input} 
+              placeholder="voce@exemplo.com" 
+              keyboardType="email-address" 
+              autoCapitalize="none" 
+              placeholderTextColor={colors.textMuted}
+              value={form.email}
+              onChangeText={(txt) => setForm({...form, email: txt})}
+            />
           </View>
 
-          {/* Senha */}
           <Text style={styles.label}>Senha</Text>
           <View style={styles.inputRow}>
             <Lock size={16} color={colors.textMuted} style={styles.inputIcon} />
-            <TextInput style={[styles.input, { flex: 1 }]} placeholder="••••••••" secureTextEntry={!showPass} placeholderTextColor={colors.textMuted} />
+            <TextInput 
+              style={[styles.input, { flex: 1 }]} 
+              placeholder="••••••••" 
+              secureTextEntry={!showPass} 
+              placeholderTextColor={colors.textMuted}
+              value={form.password}
+              onChangeText={(txt) => setForm({...form, password: txt})}
+            />
             <TouchableOpacity onPress={() => setShowPass(!showPass)} style={styles.eyeBtn}>
               {showPass ? <EyeOff size={16} color={colors.textMuted} /> : <Eye size={16} color={colors.textMuted} />}
             </TouchableOpacity>
           </View>
 
-          {/* Confirmar senha */}
           <Text style={styles.label}>Confirmar senha</Text>
           <View style={styles.inputRow}>
             <Lock size={16} color={colors.textMuted} style={styles.inputIcon} />
-            <TextInput style={[styles.input, { flex: 1 }]} placeholder="••••••••" secureTextEntry={!showConfirm} placeholderTextColor={colors.textMuted} />
+            <TextInput 
+              style={[styles.input, { flex: 1 }]} 
+              placeholder="••••••••" 
+              secureTextEntry={!showConfirm} 
+              placeholderTextColor={colors.textMuted}
+              value={form.confirmPassword}
+              onChangeText={(txt) => setForm({...form, confirmPassword: txt})}
+            />
             <TouchableOpacity onPress={() => setShowConfirm(!showConfirm)} style={styles.eyeBtn}>
               {showConfirm ? <EyeOff size={16} color={colors.textMuted} /> : <Eye size={16} color={colors.textMuted} />}
             </TouchableOpacity>
           </View>
 
-          {/* Data de nascimento */}
           <Text style={styles.label}>Data de nascimento</Text>
-          <View style={styles.inputRow}>
-            <Calendar size={16} color={colors.textMuted} style={styles.inputIcon} />
-            <TextInput
-              style={styles.input}
-              placeholder="DD/MM/AAAA"
-              placeholderTextColor={colors.textMuted}
-              value={dob}
-              onChangeText={setDob}
-              keyboardType="numeric"
-              maxLength={10}
-            />
-          </View>
+          <TouchableOpacity 
+            style={styles.inputRow} 
+            onPress={() => setShowPicker(true)}
+          >
+            <CalendarIcon size={16} color={colors.textMuted} style={styles.inputIcon} />
+            <Text style={[styles.input, { textAlignVertical: 'center', paddingTop: 12, color: form.birthDate ? colors.text : colors.textMuted }]}>
+              {dateLabel}
+            </Text>
+          </TouchableOpacity>
 
-          <TouchableOpacity style={styles.submitBtn} onPress={() => navigation.navigate('App')}>
-            <Text style={styles.submitText}>Criar conta</Text>
+          {showPicker && (
+            <DateTimePicker
+              value={date}
+              mode="date"
+              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+              onChange={onChangeDate}
+              maximumDate={new Date()} 
+            />
+          )}
+
+          <TouchableOpacity 
+            style={[styles.submitBtn, loading && { opacity: 0.7 }]} 
+            onPress={handleRegister}
+            disabled={loading}
+          >
+            {loading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.submitText}>Criar conta</Text>}
           </TouchableOpacity>
 
           <Text style={styles.bottomText}>
@@ -85,12 +180,12 @@ export default function RegisterScreen({ navigation }: any) {
             <Text style={styles.link} onPress={() => navigation.navigate('Login')}>Entrar</Text>
           </Text>
         </View>
-
         <View style={{ height: 32 }} />
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
