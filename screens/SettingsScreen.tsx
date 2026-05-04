@@ -1,17 +1,44 @@
 import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
-import { UserPen, Mail, Lock, Accessibility, Trash2 } from 'lucide-react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { UserPen, Mail, Lock, Accessibility, Trash2, LogOut } from 'lucide-react-native';
 import colors from '../theme/colors';
-
-const settings = [
-  { icon: UserPen, title: 'Editar Perfil', desc: 'Atualize suas informações pessoais', action: 'Editar', destructive: false },
-  { icon: Mail, title: 'Alterar E-mail', desc: 'Mude o e-mail da sua conta', action: 'Alterar', destructive: false },
-  { icon: Lock, title: 'Alterar Senha', desc: 'Atualize sua senha de acesso', action: 'Alterar', destructive: false },
-  { icon: Accessibility, title: 'Acessibilidade', desc: 'Configure opções de acessibilidade', action: 'Configurar', destructive: false },
-  { icon: Trash2, title: 'Excluir Conta', desc: 'Exclui permanentemente sua conta', action: 'Excluir', destructive: true },
-];
+import { useAuth } from '../hooks/useAuth'; 
 
 export default function SettingsScreen() {
+  const { logout } = useAuth(); 
+
+  const handleLogout = () => {
+    setTimeout(() => {
+      Alert.alert(
+        'Sair',
+        'Deseja realmente sair da sua conta?',
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          { 
+            text: 'Sair', 
+            style: 'destructive', 
+            onPress: async () => {
+              try {
+                await logout();
+              } catch (error) {
+                console.error("Erro ao sair:", error);
+              }
+            } 
+          }
+        ]
+      );
+    }, 0);
+  };
+
+  const settings = [
+    { icon: UserPen, title: 'Editar Perfil', desc: 'Atualize suas informações pessoais', action: 'Editar', destructive: false },
+    { icon: Mail, title: 'Alterar E-mail', desc: 'Mude o e-mail da sua conta', action: 'Alterar', destructive: false },
+    { icon: Lock, title: 'Alterar Senha', desc: 'Atualize sua senha de acesso', action: 'Alterar', destructive: false },
+    { icon: Accessibility, title: 'Acessibilidade', desc: 'Configure opções de acessibilidade', action: 'Configurar', destructive: false },
+    { icon: LogOut, title: 'Sair', desc: 'Desconectar da sua conta', action: 'Sair', destructive: false, isLogout: true }, 
+    { icon: Trash2, title: 'Excluir Conta', desc: 'Exclui permanentemente sua conta', action: 'Excluir', destructive: true },
+  ];
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.content}>
@@ -28,8 +55,13 @@ export default function SettingsScreen() {
                   <Text style={styles.itemTitle}>{s.title}</Text>
                   <Text style={styles.itemDesc}>{s.desc}</Text>
                 </View>
-                <TouchableOpacity style={[styles.actionBtn, s.destructive && styles.actionBtnDestructive]}>
-                  <Text style={[styles.actionText, s.destructive && styles.actionTextDestructive]}>{s.action}</Text>
+                <TouchableOpacity 
+                  style={[styles.actionBtn, s.destructive && styles.actionBtnDestructive]}
+                  onPress={s.isLogout ? handleLogout : undefined} 
+                >
+                  <Text style={[styles.actionText, s.destructive && styles.actionTextDestructive]}>
+                    {s.action}
+                  </Text>
                 </TouchableOpacity>
               </View>
             );

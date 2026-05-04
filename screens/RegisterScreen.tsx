@@ -28,15 +28,26 @@ export default function RegisterScreen({ navigation }: any) {
   });
 
   useEffect(() => {
-    if (message) {
-      Alert.alert(
-        messageType === 'success' ? 'Sucesso' : 'Erro',
-        message,
-        [{ text: 'OK', onPress: () => {
-          closeMessage();
-          if (messageType === 'success') navigation.navigate('Login');
-        }}]
-      );
+    if (message && messageType === 'error') {
+      const timer = setTimeout(() => {
+        Alert.alert(
+          'Erro',
+          message,
+          [{ text: 'OK', onPress: () => closeMessage() }],
+          { cancelable: false }
+        );
+      }, 200);
+
+      return () => clearTimeout(timer);
+    } else if (message && messageType === 'success') {
+       Alert.alert(
+          'Sucesso',
+          message,
+          [{ text: 'OK', onPress: () => {
+            closeMessage();
+            navigation.navigate('Login');
+          }}]
+        );
     }
   }, [message]);
 

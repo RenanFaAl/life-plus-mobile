@@ -112,16 +112,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setLoading(true)
       await authService.registerUser(data)
 
-      setMessage('Cadastro realizado com sucesso!')
       setMessageType('success')
+      setMessage('Cadastro realizado com sucesso!')
     } catch (error: any) {
-      const errorDetail = error?.response?.data?.details;
-      const errorMessage = error?.response?.data?.error;
+      const msg = error?.response?.data?.details || error?.response?.data?.error || 'Erro ao registrar usuário.';
       
-      const msg = errorDetail || errorMessage || 'Erro ao registrar usuário.';
-      
-      setMessage(msg)
-      setMessageType('error')
+      setMessageType('error');
+      setMessage(msg);
       
       console.log("Erro capturado no Mobile:", error?.response?.data);
     } finally {
