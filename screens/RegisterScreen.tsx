@@ -74,10 +74,21 @@ export default function RegisterScreen({ navigation }: any) {
       Alert.alert('Erro', 'Por favor, preencha todos os campos.');
       return;
     }
+
     if (form.password !== form.confirmPassword) {
       Alert.alert('Erro', 'As senhas não coincidem.');
       return;
     }
+
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+    if (!passwordRegex.test(form.password)) {
+      Alert.alert(
+        'Senha Inválida',
+        'Sua senha precisa de pelo menos 8 caracteres, com letras (maiúsculas e minúsculas), números e símbolos.'
+      );
+      return;
+    }
+
     await register(form);
   };
 

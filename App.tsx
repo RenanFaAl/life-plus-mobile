@@ -12,6 +12,7 @@ import HomeScreen from './screens/HomeScreen';
 import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
 import AuthenticatedLayout from './components/AuthenticatedLayout';
+import { UserProvider } from './context/UserContext';
 
 const Stack = createNativeStackNavigator();
 
@@ -51,11 +52,13 @@ function RootNavigator() {
 export default function App() {
   return (
     <AuthProvider>
-      <MedicineProvider>
-        <NavigationContainer>
-          <RootNavigator />
-        </NavigationContainer>
-      </MedicineProvider>
+      <UserProvider>
+        <MedicineProvider>
+          <NavigationContainer>
+            <RootNavigator />
+          </NavigationContainer>
+        </MedicineProvider>
+      </UserProvider>
     </AuthProvider>
   );
 }

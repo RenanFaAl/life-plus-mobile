@@ -3,9 +3,11 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert } from 'rea
 import { UserPen, Mail, Lock, Accessibility, Trash2, LogOut } from 'lucide-react-native';
 import colors from '../theme/colors';
 import { useAuth } from '../hooks/useAuth'; 
+import { useNavigation } from '@react-navigation/native';
 
 export default function SettingsScreen() {
   const { logout } = useAuth(); 
+  const navigation = useNavigation<any>()
 
   const handleLogout = () => {
     setTimeout(() => {
@@ -31,9 +33,11 @@ export default function SettingsScreen() {
   };
 
   const settings = [
-    { icon: UserPen, title: 'Editar Perfil', desc: 'Atualize suas informações pessoais', action: 'Editar', destructive: false },
-    { icon: Mail, title: 'Alterar E-mail', desc: 'Mude o e-mail da sua conta', action: 'Alterar', destructive: false },
-    { icon: Lock, title: 'Alterar Senha', desc: 'Atualize sua senha de acesso', action: 'Alterar', destructive: false },
+    { icon: UserPen, title: 'Editar Perfil', desc: 'Atualize suas informações pessoais', action: 'Editar', onPress: () => navigation.navigate('EditProfile'), destructive: false },
+    { icon: Mail, title: 'Alterar E-mail', desc: 'Mude o e-mail da sua conta', action: 'Alterar', onPress: () => navigation.navigate('ChangeEmail'), destructive: false
+    },
+    { icon: Lock, title: 'Alterar Senha', desc: 'Atualize sua senha de acesso', action: 'Alterar', onPress: () => navigation.navigate('ChangePassword'), destructive: false 
+    },
     { icon: Accessibility, title: 'Acessibilidade', desc: 'Configure opções de acessibilidade', action: 'Configurar', destructive: false },
     { icon: LogOut, title: 'Sair', desc: 'Desconectar da sua conta', action: 'Sair', destructive: false, isLogout: true }, 
     { icon: Trash2, title: 'Excluir Conta', desc: 'Exclui permanentemente sua conta', action: 'Excluir', destructive: true },
@@ -57,7 +61,7 @@ export default function SettingsScreen() {
                 </View>
                 <TouchableOpacity 
                   style={[styles.actionBtn, s.destructive && styles.actionBtnDestructive]}
-                  onPress={s.isLogout ? handleLogout : undefined} 
+                  onPress={s.isLogout ? handleLogout : s.onPress} 
                 >
                   <Text style={[styles.actionText, s.destructive && styles.actionTextDestructive]}>
                     {s.action}
