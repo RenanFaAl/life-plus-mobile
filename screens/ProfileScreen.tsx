@@ -1,23 +1,45 @@
 import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { Heart, FolderOpen, AlertTriangle, PlayCircle } from 'lucide-react-native';
 import colors from '../theme/colors';
-
-const healthStats = [
-  { icon: Heart, label: 'Condições', value: '2', color: colors.destructive },
-  { icon: FolderOpen, label: 'Pastas de Exames', value: '5', color: colors.primary },
-  { icon: AlertTriangle, label: 'Meds. Acabando', value: '1', color: colors.accent },
-];
+import { useUser } from '../hooks/useUser';
 
 export default function ProfileScreen() {
+  const { user, loading } = useUser();
+
+  const getInitials = (name: string) => {
+    if (!name) return '??';
+    const names = name.split(' ');
+    if (names.length > 1) {
+      return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+  };
+
+  const healthStats = [
+    { icon: Heart, label: 'Condições', value: user?.stats?.conditionsCount || '0', color: colors.destructive },
+    { icon: FolderOpen, label: 'Pastas de Exames', value: user?.stats?.foldersCount || '0', color: colors.primary },
+    { icon: AlertTriangle, label: 'Meds. Acabando', value: user?.stats?.lowMedsCount || '0', color: colors.accent },
+  ];
+
+  if (loading && !user) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center' }]}>
+        <ActivityIndicator size="large" color={colors.accent} />
+      </View>
+    );
+  }
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.content}>
         {/* Avatar card */}
         <View style={styles.avatarCard}>
-          <View style={styles.avatar}><Text style={styles.avatarText}>JD</Text></View>
-          <Text style={styles.name}>João Silva</Text>
-          <Text style={styles.email}>joao.silva@email.com</Text>
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>{getInitials(user?.name)}</Text>
+          </View>
+          <Text style={styles.name}>{user?.name || 'Usuário'}</Text>
+          <Text style={styles.email}>{user?.email || 'email@exemplo.com'}</Text>
         </View>
 
         {/* Health stats */}

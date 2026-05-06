@@ -1,41 +1,64 @@
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { useNavigation } from '@react-navigation/native'; 
 import { FileText, Upload } from 'lucide-react-native';
+import { useExam } from '../hooks/useExam'; 
 import colors from '../theme/colors';
 
-const exams = [
-  { name: 'Hemograma Completo', date: '15 Jan, 2026' },
-  { name: 'Raio-X do Tórax', date: '3 Dez, 2025' },
-  { name: 'Perfil Lipídico', date: '20 Nov, 2025' },
-  { name: 'Função Tireoidiana', date: '8 Out, 2025' },
-  { name: 'Urinálise', date: '12 Set, 2025' },
-  { name: 'Relatório de ECG', date: '5 Ago, 2025' },
-];
-
 export default function ExamsScreen() {
+  const navigation = useNavigation<any>();
+  const { exams = [], fetchExams, loading } = useExam();
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchExams();
+    });
+    return unsubscribe;
+  }, [navigation]);
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.content}>
         <View style={styles.header}>
           <Text style={styles.title}>Meus Exames</Text>
-          <TouchableOpacity style={styles.uploadBtn}>
+          
+          <TouchableOpacity 
+            style={styles.uploadBtn}
+            onPress={() => navigation.navigate('CreateExam')} 
+          >
             <Upload size={16} color={colors.white} />
             <Text style={styles.uploadText}>Enviar</Text>
           </TouchableOpacity>
         </View>
 
-        <View style={styles.grid}>
-          {exams.map((exam, i) => (
-            <View key={i} style={styles.card}>
-              <View style={styles.iconBox}><FileText size={22} color={colors.primary} /></View>
-              <Text style={styles.examName}>{exam.name}</Text>
-              <Text style={styles.examDate}>{exam.date}</Text>
-              <TouchableOpacity style={styles.detailsBtn}>
-                <Text style={styles.detailsText}>Ver detalhes</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
-        </View>
+        {loading && exams?.length === 0 ? (
+          <ActivityIndicator color={colors.primary} size="large" style={{ marginTop: 20 }} />
+        ) : (
+          <>
+            {exams && exams.length > 0 ? (
+              <View style={styles.grid}>
+                {exams.map((exam, i) => (
+                  <View key={exam.id || i} style={styles.card}>
+                    <View style={styles.iconBox}>
+                      <FileText size={22} color={colors.primary} />
+                    </View>
+                    <Text style={styles.examName}>{exam.name}</Text>
+                    
+                    <Text style={styles.examDate}>
+                      {new Date(exam.date).toLocaleDateString('pt-BR')}
+                    </Text>
+                    
+                    <TouchableOpacity style={styles.detailsBtn}>
+                      <Text style={styles.detailsText}>Ver detalhes</Text>
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </View>
+            ) : !loading && (
+              <Text style={styles.emptyText}>Nenhum exame encontrado.</Text>
+            )}
+          </>
+        )}
       </View>
     </ScrollView>
   );
@@ -55,4 +78,5 @@ const styles = StyleSheet.create({
   examDate: { fontSize: 13, color: colors.textMuted, marginBottom: 14 },
   detailsBtn: { borderWidth: 1, borderColor: colors.border, borderRadius: 10, paddingVertical: 10, alignItems: 'center' },
   detailsText: { fontSize: 14, fontWeight: '500', color: colors.text },
+  emptyText: { textAlign: 'center', marginTop: 40, color: colors.textMuted, fontSize: 16 },
 });

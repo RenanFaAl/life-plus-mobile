@@ -13,9 +13,11 @@ import SettingsScreen from '../screens/SettingsScreen';
 import ChangeEmailScreen from '../screens/ChangeEmailScreen';
 import ChangePasswordScreen from '../screens/ChangePasswordScreen';
 import EditProfileScreen from '../screens/EditProfileScreen';
+import CreateExamScreen from '../screens/CreateExamScreen';
 
 const Tab = createBottomTabNavigator();
 const SettingsStack = createNativeStackNavigator();
+const ExamStack = createNativeStackNavigator();
 
 function SettingsStackScreen() {
   return (
@@ -25,6 +27,15 @@ function SettingsStackScreen() {
       <SettingsStack.Screen name="ChangePassword" component={ChangePasswordScreen} />
       <SettingsStack.Screen name="EditProfile" component={EditProfileScreen} />
     </SettingsStack.Navigator>
+  );
+}
+
+function ExamStackScreen() {
+  return (
+    <ExamStack.Navigator screenOptions={{ headerShown: false }}>
+      <ExamStack.Screen name="ExamsList" component={ExamsScreen} />
+      <ExamStack.Screen name="CreateExam" component={CreateExamScreen} />
+    </ExamStack.Navigator>
   );
 }
 
@@ -79,13 +90,9 @@ export default function AuthenticatedLayout() {
     >
       <Tab.Screen name="Dashboard" component={DashboardScreen} options={{ title: 'Dashboard' }} />
       <Tab.Screen name="Profile" component={ProfileScreen} options={{ title: 'Perfil' }} />
-      <Tab.Screen name="Exams" component={ExamsScreen} options={{ title: 'Exames' }} />
+      <Tab.Screen name="Exams" component={ExamStackScreen} options={{ title: 'Exames' }} />
       <Tab.Screen name="Medications" component={MedicationsScreen} options={{ title: 'Medicamentos' }} />
-      <Tab.Screen 
-        name="Settings" 
-        component={SettingsStackScreen} 
-        options={{ title: 'Config' }} 
-      />
+      <Tab.Screen name="Settings" component={SettingsStackScreen} options={{ title: 'Config' }} />
     </Tab.Navigator>
   );
 }

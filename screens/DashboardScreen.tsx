@@ -1,27 +1,40 @@
 import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { Pill, CalendarDays, AlertTriangle, FileText, Plus, Upload, UserPen, Clock } from 'lucide-react-native';
 import colors from '../theme/colors';
-
-const stats = [
-  { icon: Pill, label: 'Medicamentos hoje', value: '3', color: colors.primary },
-  { icon: CalendarDays, label: 'Exames agendados', value: '2', color: colors.accent },
-  { icon: AlertTriangle, label: 'Estoque baixo', value: '1', color: colors.destructive },
-  { icon: FileText, label: 'Exames salvos', value: '12', color: colors.primary },
-];
-
-const recentActivity = [
-  { text: 'Tomou Amoxicilina', time: 'Há 2 horas', icon: Pill },
-  { text: 'Exame de sangue enviado', time: 'Ontem', icon: Upload },
-  { text: 'Tomou Ibuprofeno', time: 'Ontem', icon: Pill },
-  { text: 'Raio-X enviado', time: 'Há 3 dias', icon: FileText },
-];
+import { useUser } from '../hooks/useUser';
 
 export default function DashboardScreen({ navigation }: any) {
+  const { user, loading } = useUser();
+
+  const firstName = user?.name ? user.name.split(' ')[0] : 'Usuário';
+
+  const stats = [
+    { icon: Pill, label: 'Medicamentos hoje', value: '3', color: colors.primary },
+    { icon: CalendarDays, label: 'Exames agendados', value: '2', color: colors.accent },
+    { icon: AlertTriangle, label: 'Estoque baixo', value: '1', color: colors.destructive },
+    { icon: FileText, label: 'Exames salvos', value: '12', color: colors.primary },
+  ];
+
+  const recentActivity = [
+    { text: 'Tomou Amoxicilina', time: 'Há 2 horas', icon: Pill },
+    { text: 'Exame de sangue enviado', time: 'Ontem', icon: Upload },
+    { text: 'Tomou Ibuprofeno', time: 'Ontem', icon: Pill },
+    { text: 'Raio-X enviado', time: 'Há 3 dias', icon: FileText },
+  ];
+
+  if (loading && !user) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center' }]}>
+        <ActivityIndicator size="large" color={colors.accent} />
+      </View>
+    );
+  }
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.content}>
-        <Text style={styles.title}>Olá, João! 👋</Text>
+        <Text style={styles.title}>Olá, {firstName}! 👋</Text>
         <Text style={styles.subtitle}>Aqui está o seu resumo de saúde</Text>
 
         {/* Stats grid */}
@@ -70,7 +83,7 @@ export default function DashboardScreen({ navigation }: any) {
               <Upload size={16} color={colors.white} />
               <Text style={styles.actionBtnPrimaryText}>Enviar Exame</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.actionBtnOutline} onPress={() => navigation.navigate('Profile')}>
+            <TouchableOpacity style={styles.actionBtnOutline} onPress={() => navigation.navigate('Settings')}>
               <UserPen size={16} color={colors.text} />
               <Text style={styles.actionBtnOutlineText}>Atualizar Perfil</Text>
             </TouchableOpacity>

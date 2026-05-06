@@ -13,6 +13,7 @@ import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
 import AuthenticatedLayout from './components/AuthenticatedLayout';
 import { UserProvider } from './context/UserContext';
+import { ExamProvider } from './context/ExamContext';
 
 const Stack = createNativeStackNavigator();
 
@@ -53,11 +54,13 @@ export default function App() {
   return (
     <AuthProvider>
       <UserProvider>
-        <MedicineProvider>
-          <NavigationContainer>
-            <RootNavigator />
-          </NavigationContainer>
-        </MedicineProvider>
+        <ExamProvider>
+          <MedicineProvider>
+            <NavigationContainer>
+              <RootNavigator />
+            </NavigationContainer>
+          </MedicineProvider>
+        </ExamProvider>
       </UserProvider>
     </AuthProvider>
   );
