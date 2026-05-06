@@ -12,7 +12,7 @@ import {
   Platform 
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { Camera, X, Calendar, FileText, AlignLeft, ChevronLeft } from 'lucide-react-native';
+import { Camera, X, Calendar, FileText, AlignLeft, ChevronLeft, ClipboardList } from 'lucide-react-native';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { useExam } from '../hooks/useExam'; 
 import colors from '../theme/colors';
@@ -26,9 +26,9 @@ export default function CreateExamScreen({ navigation }: any) {
 
   const [form, setForm] = useState({
     name: '',
-    description: '',
+    description: '', 
     date: new Date().toISOString().split('T')[0], 
-    result: '',
+    result: '',      
   });
   
   const [images, setImages] = useState<ImagePicker.ImagePickerAsset[]>([]);
@@ -38,7 +38,6 @@ export default function CreateExamScreen({ navigation }: any) {
 
     if (selectedDate) {
       setDate(selectedDate);
-      
       setDateLabel(selectedDate.toLocaleDateString('pt-BR'));
 
       const year = selectedDate.getFullYear();
@@ -107,7 +106,7 @@ export default function CreateExamScreen({ navigation }: any) {
 
       <View style={styles.form}>
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Nome do Exame</Text>
+          <Text style={styles.label}>Nome do Exame *</Text>
           <View style={styles.inputContainer}>
             <FileText size={20} color={colors.textMuted} />
             <TextInput 
@@ -120,7 +119,7 @@ export default function CreateExamScreen({ navigation }: any) {
         </View>
 
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Data da Realização</Text>
+          <Text style={styles.label}>Data da Realização *</Text>
           <TouchableOpacity 
             style={styles.inputContainer} 
             onPress={() => setShowPicker(true)}
@@ -143,16 +142,31 @@ export default function CreateExamScreen({ navigation }: any) {
         )}
 
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Observações / Resultado</Text>
+          <Text style={styles.label}>Resultado (Opcional)</Text>
           <View style={[styles.inputContainer, styles.textAreaContainer]}>
-            <AlignLeft size={20} color={colors.textMuted} style={{ marginTop: 12 }} />
+            <ClipboardList size={20} color={colors.textMuted} style={{ marginTop: 12 }} />
             <TextInput 
               style={[styles.input, styles.textArea]}
               placeholder="Digite aqui os detalhes do resultado..."
               multiline
-              numberOfLines={4}
+              numberOfLines={3}
               value={form.result}
               onChangeText={(text) => setForm({...form, result: text})}
+            />
+          </View>
+        </View>
+
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>Descrição / Observações (Opcional)</Text>
+          <View style={[styles.inputContainer, styles.textAreaContainer]}>
+            <AlignLeft size={20} color={colors.textMuted} style={{ marginTop: 12 }} />
+            <TextInput 
+              style={[styles.input, styles.textArea]}
+              placeholder="Ex: Exame feito em jejum de 12h..."
+              multiline
+              numberOfLines={3}
+              value={form.description}
+              onChangeText={(text) => setForm({...form, description: text})}
             />
           </View>
         </View>
@@ -194,7 +208,7 @@ export default function CreateExamScreen({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
+  container: { flex: 1, backgroundColor: colors.background, paddingTop: 20 },
   content: { padding: 20, paddingBottom: 40 },
   header: { flexDirection: 'row', alignItems: 'center', marginBottom: 30, gap: 10 },
   backBtn: { padding: 5 },

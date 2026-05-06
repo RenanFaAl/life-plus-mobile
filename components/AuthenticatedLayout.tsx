@@ -14,6 +14,7 @@ import ChangeEmailScreen from '../screens/ChangeEmailScreen';
 import ChangePasswordScreen from '../screens/ChangePasswordScreen';
 import EditProfileScreen from '../screens/EditProfileScreen';
 import CreateExamScreen from '../screens/CreateExamScreen';
+import ExamDetailsScreen from '../screens/ExamDetailsScreen';
 
 const Tab = createBottomTabNavigator();
 const SettingsStack = createNativeStackNavigator();
@@ -35,6 +36,7 @@ function ExamStackScreen() {
     <ExamStack.Navigator screenOptions={{ headerShown: false }}>
       <ExamStack.Screen name="ExamsList" component={ExamsScreen} />
       <ExamStack.Screen name="CreateExam" component={CreateExamScreen} />
+      <ExamStack.Screen name="ExamDetails" component={ExamDetailsScreen} />
     </ExamStack.Navigator>
   );
 }
@@ -46,7 +48,7 @@ export default function AuthenticatedLayout() {
         headerShown: ((route) => {
           const routeName = getFocusedRouteNameFromRoute(route) ?? "SettingsHome";
           
-          const hideHeaderScreens = ["EditProfile", "ChangeEmail", "ChangePassword", "Accessibility"];
+          const hideHeaderScreens = ["EditProfile", "ChangeEmail", "ChangePassword", "Accessibility", "CreateExam", "ExamDetails"];
           
           if (hideHeaderScreens.includes(routeName)) {
             return false;
@@ -61,7 +63,7 @@ export default function AuthenticatedLayout() {
         tabBarStyle: ((route) => {
           const routeName = getFocusedRouteNameFromRoute(route) ?? "SettingsHome";
           
-          const hideOnScreens = ["EditProfile", "ChangeEmail", "ChangePassword", "Accessibility"];
+          const hideOnScreens = ["EditProfile", "ChangeEmail", "ChangePassword", "Accessibility", "CreateExam", "ExamDetails"];
           
           if (hideOnScreens.includes(routeName)) {
             return { display: 'none' };

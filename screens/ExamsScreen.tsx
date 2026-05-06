@@ -48,7 +48,10 @@ export default function ExamsScreen() {
                       {new Date(exam.date).toLocaleDateString('pt-BR')}
                     </Text>
                     
-                    <TouchableOpacity style={styles.detailsBtn}>
+                    <TouchableOpacity 
+                      style={styles.detailsBtn}
+                      onPress={() => navigation.navigate('ExamDetails', { exam })} 
+                    >
                       <Text style={styles.detailsText}>Ver detalhes</Text>
                     </TouchableOpacity>
                   </View>
