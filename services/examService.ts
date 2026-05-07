@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import { api } from './api'
 
 export interface AppFile {
@@ -35,8 +36,8 @@ export interface UpdateExamData {
   description?: string
   date?: string
   result?: string
-  files?: AppFile[] 
-  removePhotos?: string[]
+  files?: AppFile[];
+  removePhotos?: string[]; 
 }
 
 export const getExams = async (): Promise<Exam[]> => {
@@ -74,31 +75,42 @@ export const createExam = async (data: CreateExamData) => {
 }
 
 export const updateExam = async (id: string, data: UpdateExamData) => {
-  const formData = new FormData()
+  const formData = new FormData();
   
-  if (data.name) formData.append('name', data.name)
-  if (data.description) formData.append('description', data.description)
-  if (data.date) formData.append('date', data.date)
-  if (data.result) formData.append('result', data.result)
+  if (data.name) formData.append('name', data.name);
+  if (data.description) formData.append('description', data.description);
+  if (data.date) formData.append('date', data.date);
+  if (data.result) formData.append('result', data.result);
   
-  if (data.removePhotos)
-    formData.append('removePhotos', JSON.stringify(data.removePhotos))
+  if (data.removePhotos && data.removePhotos.length > 0) {
+    data.removePhotos.forEach(photoId => {
+      formData.append('removePhotos[]', photoId); 
+    });
+  }
     
-  if (data.files) {
-    data.files.forEach(file => {
-      formData.append('files', {
+  if (data.files && data.files.length > 0) {
+    data.files.forEach((file) => {
+      const fileData = {
         uri: file.uri,
-        type: file.type,
-        name: file.name,
-      } as any)
-    })
+        type: file.type || 'image/jpeg',
+        name: file.name || `photo_${Date.now()}.jpg`,
+      };
+      
+      // @ts-ignore
+      formData.append('files', fileData);
+    });
   }
 
   const response = await api.put(`/exams/${id}`, formData, {
-    headers: { 'Content-Type': 'multipart/form-data' }
-  })
-  return response.data
-}
+    headers: { 
+      'Content-Type': 'multipart/form-data',
+    },
+    transformRequest: (data) => {
+      return data;
+    },
+  });
+  return response.data;
+};
 
 export const deleteExam = async (id: string) => {
   const response = await api.delete(`/exams/${id}`)

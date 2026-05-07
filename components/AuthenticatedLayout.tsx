@@ -15,6 +15,7 @@ import ChangePasswordScreen from '../screens/ChangePasswordScreen';
 import EditProfileScreen from '../screens/EditProfileScreen';
 import CreateExamScreen from '../screens/CreateExamScreen';
 import ExamDetailsScreen from '../screens/ExamDetailsScreen';
+import EditExamScreen from '../screens/EditExamScreen';
 
 const Tab = createBottomTabNavigator();
 const SettingsStack = createNativeStackNavigator();
@@ -37,6 +38,7 @@ function ExamStackScreen() {
       <ExamStack.Screen name="ExamsList" component={ExamsScreen} />
       <ExamStack.Screen name="CreateExam" component={CreateExamScreen} />
       <ExamStack.Screen name="ExamDetails" component={ExamDetailsScreen} />
+      <ExamStack.Screen name="EditExam" component={EditExamScreen} />
     </ExamStack.Navigator>
   );
 }

@@ -1,20 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, Modal, Image } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import { FileText, Calendar, AlignLeft, ClipboardList, Download, Trash2, ArrowLeft, X, Image as ImageIcon } from 'lucide-react-native';
+import { FileText, Calendar, AlignLeft, ClipboardList, Download, Trash2, ArrowLeft, Edit3, X, Image as ImageIcon, AlertCircle } from 'lucide-react-native';
 import { useExam } from '../hooks/useExam';
 import { useAuth } from '../hooks/useAuth'; 
 import colors from '../theme/colors';
 
 export default function ExamDetailsScreen() {
-const route = useRoute<any>();
-  const navigation = useNavigation();
+  const route = useRoute<any>();
+  const navigation = useNavigation<any>();
   const { exam } = route.params;
   const { token } = useAuth(); 
   const { deleteExam, downloadExamPhoto } = useExam();
   
   const [photoUris, setPhotoUris] = useState<Record<string, string>>({});
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<any>(null);
   const [imgError, setImgError] = useState<Record<string, boolean>>({});
 
@@ -54,6 +55,24 @@ const route = useRoute<any>();
     setImgError(prev => ({ ...prev, [photoId]: true }));
   };
 
+  const confirmDeletion = async () => {
+    setShowDeleteModal(false);
+    setIsDeleting(true);
+    try {
+      await deleteExam(exam.id);
+      setIsDeleting(false);
+      
+      Alert.alert(
+        "Sucesso", 
+        "O exame foi excluído permanentemente.",
+        [{ text: "OK", onPress: () => navigation.navigate('ExamsList') }]
+      );
+    } catch (error: any) {
+      setIsDeleting(false);
+      Alert.alert("Erro", error.message || "Não foi possível excluir o exame.");
+    }
+  };
+
   const handleDelete = () => {
     Alert.alert(
       "Excluir Exame",
@@ -88,9 +107,16 @@ const route = useRoute<any>();
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
           <ArrowLeft size={24} color={colors.text} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={handleDelete} disabled={isDeleting}>
-          {isDeleting ? <ActivityIndicator color="red" /> : <Trash2 size={22} color="#ef4444" />}
-        </TouchableOpacity>
+        
+        <View style={{ flexDirection: 'row', gap: 20 }}>
+          <TouchableOpacity onPress={() => navigation.navigate('EditExam', { exam })}>
+            <Edit3 size={22} color={colors.primary} />
+          </TouchableOpacity>
+          
+          <TouchableOpacity onPress={handleDelete} disabled={isDeleting}>
+            {isDeleting ? <ActivityIndicator color="red" /> : <Trash2 size={22} color="#ef4444" />}
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={styles.titleContainer}>
@@ -158,6 +184,34 @@ const route = useRoute<any>();
           <Download size={20} color={colors.primary} />
         </TouchableOpacity>
       ))}
+
+      <Modal visible={showDeleteModal} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.deleteModalContent}>
+            <AlertCircle size={48} color="#ef4444" style={{ marginBottom: 15 }} />
+            <Text style={styles.deleteModalTitle}>Excluir Exame?</Text>
+            <Text style={styles.deleteModalText}>
+              Esta ação é permanente e não poderá ser desfeita. Todos os dados e anexos deste exame serão removidos.
+            </Text>
+            
+            <View style={styles.modalButtonsRow}>
+              <TouchableOpacity 
+                style={styles.cancelBtn} 
+                onPress={() => setShowDeleteModal(false)}
+              >
+                <Text style={styles.cancelBtnText}>Cancelar</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.confirmDeleteBtn} 
+                onPress={confirmDeletion}
+              >
+                <Text style={styles.confirmDeleteBtnText}>Confirmar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
 
       <Modal visible={!!selectedPhoto} transparent={true} animationType="fade">
         <View style={styles.modalOverlay}>
@@ -256,5 +310,53 @@ const styles = StyleSheet.create({
     marginTop: 20 
   },
   bigDownloadText: { color: '#FFF', fontWeight: 'bold', fontSize: 16 },
-  emptyFiles: { color: colors.textMuted, fontStyle: 'italic', textAlign: 'center' }
+  emptyFiles: { color: colors.textMuted, fontStyle: 'italic', textAlign: 'center' },
+  deleteModalContent: {
+    width: '85%',
+    backgroundColor: colors.white,
+    borderRadius: 20,
+    padding: 25,
+    alignItems: 'center',
+    elevation: 10
+  },
+  deleteModalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: colors.text,
+    marginBottom: 10
+  },
+  deleteModalText: {
+    fontSize: 14,
+    color: colors.textMuted,
+    textAlign: 'center',
+    marginBottom: 25,
+    lineHeight: 20
+  },
+  modalButtonsRow: {
+    flexDirection: 'row',
+    gap: 12,
+    width: '100%'
+  },
+  cancelBtn: {
+    flex: 1,
+    padding: 15,
+    borderRadius: 12,
+    backgroundColor: '#f3f4f6',
+    alignItems: 'center'
+  },
+  cancelBtnText: {
+    color: colors.text,
+    fontWeight: '600'
+  },
+  confirmDeleteBtn: {
+    flex: 1,
+    padding: 15,
+    borderRadius: 12,
+    backgroundColor: '#ef4444',
+    alignItems: 'center'
+  },
+  confirmDeleteBtnText: {
+    color: '#FFF',
+    fontWeight: '600'
+  }
 });
