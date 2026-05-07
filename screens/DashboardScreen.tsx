@@ -1,11 +1,18 @@
-import React from 'react';
+import React, { useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { Pill, CalendarDays, AlertTriangle, FileText, Plus, Upload, UserPen, Clock } from 'lucide-react-native';
 import colors from '../theme/colors';
 import { useUser } from '../hooks/useUser';
 
 export default function DashboardScreen({ navigation }: any) {
-  const { user, loading } = useUser();
+  const { user, loading, fetchUser } = useUser();
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchUser();
+    }, [])
+  );
 
   const firstName = user?.name ? user.name.split(' ')[0] : 'Usuário';
 
