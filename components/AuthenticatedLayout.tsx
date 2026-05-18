@@ -16,10 +16,17 @@ import EditProfileScreen from '../screens/EditProfileScreen';
 import CreateExamScreen from '../screens/CreateExamScreen';
 import ExamDetailsScreen from '../screens/ExamDetailsScreen';
 import EditExamScreen from '../screens/EditExamScreen';
+import CreateMedicineScreen from '../screens/CreateMedicineScreen';
+import MedicineDetailsScreen from '../screens/MedicineDetailsScreen';
+import EditMedicineScreen from '../screens/EditMedicineScreen';
+import RegisterMedicineDoseScreen from '../screens/RegisterMedicineDoseScreen';
 
 const Tab = createBottomTabNavigator();
 const SettingsStack = createNativeStackNavigator();
 const ExamStack = createNativeStackNavigator();
+const MedicineStack = createNativeStackNavigator();
+
+const hideArray = ["EditProfile", "ChangeEmail", "ChangePassword", "Accessibility", "CreateExam", "ExamDetails", "CreateMedicine"];
 
 function SettingsStackScreen() {
   return (
@@ -43,6 +50,18 @@ function ExamStackScreen() {
   );
 }
 
+function MedicineStackScreen() {
+  return (
+    <MedicineStack.Navigator screenOptions={{ headerShown: false }}>
+      <MedicineStack.Screen name="MedicinesList" component={MedicationsScreen} />
+      <MedicineStack.Screen name="CreateMedicine" component={CreateMedicineScreen} />
+      <MedicineStack.Screen name="MedicineDetails" component={MedicineDetailsScreen} />
+      <MedicineStack.Screen name="EditMedicine" component={EditMedicineScreen} />
+      <MedicineStack.Screen name="RegisterMedicineDose" component={RegisterMedicineDoseScreen} />
+    </MedicineStack.Navigator>
+  );
+}
+
 export default function AuthenticatedLayout() {
   return (
     <Tab.Navigator
@@ -50,7 +69,7 @@ export default function AuthenticatedLayout() {
         headerShown: ((route) => {
           const routeName = getFocusedRouteNameFromRoute(route) ?? "SettingsHome";
           
-          const hideHeaderScreens = ["EditProfile", "ChangeEmail", "ChangePassword", "Accessibility", "CreateExam", "ExamDetails"];
+          const hideHeaderScreens = ["EditProfile", "ChangeEmail", "ChangePassword", "Accessibility", "CreateExam", "ExamDetails", "CreateMedicine", "MedicineDetails", "EditMedicine", "RegisterMedicineDose"];
           
           if (hideHeaderScreens.includes(routeName)) {
             return false;
@@ -65,7 +84,7 @@ export default function AuthenticatedLayout() {
         tabBarStyle: ((route) => {
           const routeName = getFocusedRouteNameFromRoute(route) ?? "SettingsHome";
           
-          const hideOnScreens = ["EditProfile", "ChangeEmail", "ChangePassword", "Accessibility", "CreateExam", "ExamDetails"];
+          const hideOnScreens = ["EditProfile", "ChangeEmail", "ChangePassword", "Accessibility", "CreateExam", "ExamDetails", "CreateMedicine", "MedicineDetails", "EditMedicine", "RegisterMedicineDose"];
           
           if (hideOnScreens.includes(routeName)) {
             return { display: 'none' };
@@ -95,7 +114,7 @@ export default function AuthenticatedLayout() {
       <Tab.Screen name="Dashboard" component={DashboardScreen} options={{ title: 'Dashboard' }} />
       <Tab.Screen name="Profile" component={ProfileScreen} options={{ title: 'Perfil' }} />
       <Tab.Screen name="Exams" component={ExamStackScreen} options={{ title: 'Exames' }} />
-      <Tab.Screen name="Medications" component={MedicationsScreen} options={{ title: 'Medicamentos' }} />
+      <Tab.Screen name="Medications" component={MedicineStackScreen} options={{ title: 'Medicamentos' }} />
       <Tab.Screen name="Settings" component={SettingsStackScreen} options={{ title: 'Config' }} />
     </Tab.Navigator>
   );
