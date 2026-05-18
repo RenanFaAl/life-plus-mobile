@@ -4,7 +4,7 @@ import {
   KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator, Alert 
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Mail, Lock, Eye, EyeOff } from 'lucide-react-native';
+import { Mail, Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react-native';
 import colors from '../theme/colors';
 import { useAuth } from '../hooks/useAuth';
 
@@ -46,12 +46,35 @@ export default function LoginScreen({ navigation }: any) {
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
-        <LinearGradient colors={[colors.gradientStart, colors.gradientEnd]} style={styles.topGradient}>
-          <TouchableOpacity style={styles.logoRow} onPress={() => navigation.navigate('Home')}>
-            <View style={styles.logoIcon}><Text style={styles.logoIconText}>L+</Text></View>
-            <Text style={styles.logoText}>Life+</Text>
+        <LinearGradient 
+          colors={[colors.gradientStart, colors.gradientEnd]} 
+          style={styles.topGradient}
+        >
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <ArrowLeft size={22} color={colors.white} />
           </TouchableOpacity>
-          <Text style={styles.tagline}>Sua saúde sempre ao alcance das mãos</Text>
+
+          <TouchableOpacity
+            style={styles.logoRow}
+            onPress={() => navigation.navigate('Home')}
+          >
+            <View style={styles.logoIcon}>
+              <Text style={styles.logoIconText}>
+                L+
+              </Text>
+            </View>
+
+            <Text style={styles.logoText}>
+              Life+
+            </Text>
+          </TouchableOpacity>
+
+          <Text style={styles.tagline}>
+            Sua saúde sempre ao alcance das mãos
+          </Text>
         </LinearGradient>
 
         <View style={styles.card}>
@@ -74,7 +97,15 @@ export default function LoginScreen({ navigation }: any) {
 
           <View style={styles.labelRow}>
             <Text style={styles.label}>Senha</Text>
-            <TouchableOpacity><Text style={styles.forgot}>Esqueceu a senha?</Text></TouchableOpacity>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate('ResetPassword')
+              }
+            >
+              <Text style={styles.forgot}>
+                Esqueceu a senha?
+              </Text>
+            </TouchableOpacity>
           </View>
           <View style={styles.inputRow}>
             <Lock size={16} color={colors.textMuted} style={styles.inputIcon} />
@@ -110,7 +141,24 @@ export default function LoginScreen({ navigation }: any) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   scroll: { flexGrow: 1 },
-  topGradient: { padding: 32, paddingTop: 60, alignItems: 'center' },
+  topGradient: {
+    padding: 32,
+    paddingTop: 60,
+    alignItems: 'center',
+    position: 'relative'
+  },
+  backButton: {
+    position: 'absolute',
+    top: 60,
+    left: 20,
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10
+  },
   logoRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 16 },
   logoIcon: { width: 44, height: 44, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' },
   logoIconText: { color: colors.white, fontWeight: 'bold', fontSize: 16 },

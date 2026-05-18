@@ -4,7 +4,7 @@ import {
   KeyboardAvoidingView, Platform, ScrollView, Alert, ActivityIndicator
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Mail, Lock, Eye, EyeOff, User, Calendar as CalendarIcon } from 'lucide-react-native';
+import { Mail, Lock, Eye, EyeOff, User, Calendar as CalendarIcon, ArrowLeft } from 'lucide-react-native';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import colors from '../theme/colors';
 import { useAuth } from '../hooks/useAuth';
@@ -99,6 +99,13 @@ export default function RegisterScreen({ navigation }: any) {
     >
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
         <LinearGradient colors={[colors.gradientEnd, colors.gradientStart]} style={styles.topGradient}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <ArrowLeft size={22} color={colors.white} />
+          </TouchableOpacity>
+          
           <TouchableOpacity style={styles.logoRow} onPress={() => navigation.navigate('Home')}>
             <View style={styles.logoIcon}><Text style={styles.logoIconText}>L+</Text></View>
             <Text style={styles.logoText}>Life+</Text>
@@ -212,7 +219,8 @@ export default function RegisterScreen({ navigation }: any) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   scroll: { flexGrow: 1 },
-  topGradient: { padding: 32, paddingTop: 60, alignItems: 'center' },
+  topGradient: { padding: 32, paddingTop: 60, alignItems: 'center', position: 'relative' },
+  backButton: { position: 'absolute', top: 60, left: 20, width: 40, height: 40, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center', zIndex: 10 },
   logoRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 16 },
   logoIcon: { width: 44, height: 44, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' },
   logoIconText: { color: colors.white, fontWeight: 'bold', fontSize: 16 },

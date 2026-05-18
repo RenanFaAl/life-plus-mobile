@@ -14,6 +14,7 @@ import RegisterScreen from './screens/RegisterScreen';
 import AuthenticatedLayout from './components/AuthenticatedLayout';
 import { UserProvider } from './context/UserContext';
 import { ExamProvider } from './context/ExamContext';
+import ResetPasswordScreen from './screens/ResetPasswordScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -42,6 +43,7 @@ function RootNavigator() {
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Register" component={RegisterScreen} />
+          <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
         </>
       ) : (
         <Stack.Screen name="App" component={AuthenticatedLayout} />
