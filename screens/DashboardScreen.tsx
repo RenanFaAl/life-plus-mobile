@@ -1,104 +1,328 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
-import { Pill, CalendarDays, AlertTriangle, FileText, Plus, Upload, UserPen, Clock } from 'lucide-react-native';
+
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator
+} from 'react-native';
+
+import {
+  Pill,
+  CalendarDays,
+  AlertTriangle,
+  FileText,
+  Plus,
+  Upload,
+  UserPen,
+  Clock
+} from 'lucide-react-native';
+
 import colors from '../theme/colors';
+
 import { useUser } from '../hooks/useUser';
+import * as dashboardService from '../services/dashboardService';
 
 export default function DashboardScreen({ navigation }: any) {
+
   const { user, loading, fetchUser } = useUser();
+
+  const [dashboard, setDashboard] = useState<any>(null);
+
+  const [dashboardLoading, setDashboardLoading] =
+    useState(true);
+
+
+  const loadDashboard = async () => {
+
+    try {
+
+      setDashboardLoading(true);
+      const data =
+        await dashboardService.getDashboard();
+
+      setDashboard(data);
+    } catch (error) {
+      console.log(
+        'Erro ao carregar dashboard:',
+        error
+      );
+
+    } finally {
+      setDashboardLoading(false);
+    }
+
+  }
+
 
   useFocusEffect(
     useCallback(() => {
       fetchUser();
+      loadDashboard();
     }, [])
-  );
+  )
 
-  const firstName = user?.name ? user.name.split(' ')[0] : 'Usuário';
 
-  const stats = [
-    { icon: Pill, label: 'Medicamentos hoje', value: '3', color: colors.primary },
-    { icon: CalendarDays, label: 'Exames agendados', value: '2', color: colors.accent },
-    { icon: AlertTriangle, label: 'Estoque baixo', value: '1', color: colors.destructive },
-    { icon: FileText, label: 'Exames salvos', value: '12', color: colors.primary },
-  ];
+  const firstName =
+    user?.name?.split(' ')[0] || 'Usuário';
 
-  const recentActivity = [
-    { text: 'Tomou Amoxicilina', time: 'Há 2 horas', icon: Pill },
-    { text: 'Exame de sangue enviado', time: 'Ontem', icon: Upload },
-    { text: 'Tomou Ibuprofeno', time: 'Ontem', icon: Pill },
-    { text: 'Raio-X enviado', time: 'Há 3 dias', icon: FileText },
-  ];
-
-  if (loading && !user) {
+  if (
+    (loading && !user)
+    ||
+    dashboardLoading
+  ) {
     return (
-      <View style={[styles.container, { justifyContent: 'center' }]}>
-        <ActivityIndicator size="large" color={colors.accent} />
+
+      <View
+        style={[
+          styles.container,
+          {
+            justifyContent: 'center'
+          }
+        ]}
+      >
+
+        <ActivityIndicator
+          size='large'
+          color={colors.accent}
+        />
+
       </View>
-    );
+
+    )
+
   }
 
-  return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <View style={styles.content}>
-        <Text style={styles.title}>Olá, {firstName}! 👋</Text>
-        <Text style={styles.subtitle}>Aqui está o seu resumo de saúde</Text>
 
-        {/* Stats grid */}
+  const stats = [
+
+    {
+      icon: Pill,
+      label: 'Medicamentos hoje',
+      value:
+        dashboard?.medicationsToday || 0,
+      color: colors.primary
+    },
+
+    {
+      icon: CalendarDays,
+      label: 'Exames agendados',
+      value:
+        dashboard?.scheduledExams || 0,
+      color: colors.accent
+    },
+
+    {
+      icon: AlertTriangle,
+      label: 'Estoque baixo',
+      value:
+        dashboard?.lowStock || 0,
+      color: colors.destructive
+    },
+
+    {
+      icon: FileText,
+      label: 'Exames salvos',
+      value:
+        dashboard?.savedExams || 0,
+      color: colors.primary
+    }
+
+  ]
+
+
+  return (
+
+    <ScrollView
+      style={styles.container}
+      showsVerticalScrollIndicator={false}
+    >
+
+      <View style={styles.content}>
+
+        <Text style={styles.title}>
+          Olá, {firstName}! 👋
+        </Text>
+
+        <Text style={styles.subtitle}>
+          Aqui está seu resumo
+        </Text>
+
+
         <View style={styles.grid}>
+
           {stats.map((s, i) => {
-            const Icon = s.icon;
+
+            const Icon = s.icon
+
             return (
-              <View key={i} style={styles.statCard}>
-                <Icon size={22} color={s.color} />
-                <Text style={styles.statValue}>{s.value}</Text>
-                <Text style={styles.statLabel}>{s.label}</Text>
+
+              <View
+                key={i}
+                style={styles.statCard}
+              >
+
+                <Icon
+                  size={22}
+                  color={s.color}
+                />
+
+                <Text
+                  style={styles.statValue}
+                >
+
+                  {s.value}
+
+                </Text>
+
+                <Text
+                  style={styles.statLabel}
+                >
+
+                  {s.label}
+
+                </Text>
               </View>
-            );
+
+            )
+
           })}
+
         </View>
 
-        {/* Recent activity */}
+
         <View style={styles.card}>
           <View style={styles.cardHeader}>
-            <Clock size={18} color={colors.textMuted} />
-            <Text style={styles.cardTitle}>Atividade Recente</Text>
+            <Clock
+              size={18}
+              color={colors.textMuted}
+            />
+
+            <Text style={styles.cardTitle}>
+              Atividade Recente
+            </Text>
           </View>
-          {recentActivity.map((a, i) => {
-            const Icon = a.icon;
-            return (
-              <View key={i} style={styles.activityRow}>
-                <View style={styles.activityIcon}><Icon size={16} color={colors.accent} /></View>
-                <View style={styles.activityText}>
-                  <Text style={styles.activityTitle}>{a.text}</Text>
-                  <Text style={styles.activityTime}>{a.time}</Text>
-                </View>
-              </View>
-            );
-          })}
+
+
+          {
+            dashboard?.recentActivity?.map(
+              (a: any, i: number) => {
+
+                const Icon =
+                  a.type === "medication"
+                    ? Pill
+                    : FileText
+
+
+                return (
+
+                  <View
+                    key={i}
+                    style={styles.activityRow}
+                  >
+
+                    <View
+                      style={styles.activityIcon}
+                    >
+
+                      <Icon
+                        size={16}
+                        color={colors.accent}
+                      />
+
+                    </View>
+
+                    <View
+                      style={styles.activityText}
+                    >
+
+                      <Text
+                        style={styles.activityTitle}
+                      >
+
+                        {a.text}
+
+                      </Text>
+
+                      <Text
+                        style={styles.activityTime}
+                      >
+
+                        {a.time}
+
+                      </Text>
+                    </View>
+                  </View>
+                )
+              })
+          }
         </View>
 
-        {/* Quick actions */}
+
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Ações Rápidas</Text>
+          <Text style={styles.cardTitle}>
+            Ações rápidas
+          </Text>
+
           <View style={styles.actionsCol}>
-            <TouchableOpacity style={styles.actionBtnPrimary} onPress={() => navigation.navigate('Medications')}>
-              <Plus size={16} color={colors.white} />
-              <Text style={styles.actionBtnPrimaryText}>Adicionar Medicamento</Text>
+            <TouchableOpacity
+              style={styles.actionBtnPrimary}
+              onPress={() =>
+                navigation.navigate(
+                  'Medications'
+                )
+              }
+            >
+
+              <Plus
+                size={16}
+                color={colors.white}
+              />
+
+              <Text
+                style={
+                  styles.actionBtnPrimaryText
+                }
+              >
+
+                Adicionar Medicamento
+
+              </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.actionBtnPrimary} onPress={() => navigation.navigate('Exams')}>
-              <Upload size={16} color={colors.white} />
-              <Text style={styles.actionBtnPrimaryText}>Enviar Exame</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.actionBtnOutline} onPress={() => navigation.navigate('Settings')}>
-              <UserPen size={16} color={colors.text} />
-              <Text style={styles.actionBtnOutlineText}>Atualizar Perfil</Text>
+
+            <TouchableOpacity
+              style={styles.actionBtnPrimary}
+              onPress={() =>
+                navigation.navigate(
+                  'Exams'
+                )
+              }
+            >
+
+              <Upload
+                size={16}
+                color={colors.white}
+              />
+
+              <Text
+                style={
+                  styles.actionBtnPrimaryText
+                }
+              >
+                Enviar Exame
+              </Text>
+
             </TouchableOpacity>
           </View>
         </View>
       </View>
     </ScrollView>
+
   );
+
 }
 
 const styles = StyleSheet.create({
