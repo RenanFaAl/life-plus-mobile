@@ -20,6 +20,7 @@ import CreateMedicineScreen from '../screens/CreateMedicineScreen';
 import MedicineDetailsScreen from '../screens/MedicineDetailsScreen';
 import EditMedicineScreen from '../screens/EditMedicineScreen';
 import RegisterMedicineDoseScreen from '../screens/RegisterMedicineDoseScreen';
+import MapScreen from '../screens/MapScreen';
 
 const Tab = createBottomTabNavigator();
 const SettingsStack = createNativeStackNavigator();
@@ -104,6 +105,7 @@ export default function AuthenticatedLayout() {
             Profile: User,
             Exams: FileText,
             Medications: Pill,
+            Map: Map,
             Settings: Settings,
           };
           const Icon = icons[route.name];
@@ -115,6 +117,7 @@ export default function AuthenticatedLayout() {
       <Tab.Screen name="Profile" component={ProfileScreen} options={{ title: 'Perfil' }} />
       <Tab.Screen name="Exams" component={ExamStackScreen} options={{ title: 'Exames' }} />
       <Tab.Screen name="Medications" component={MedicineStackScreen} options={{ title: 'Medicamentos' }} />
+      <Tab.Screen name="Map" component={MapScreen} options={{ title: 'Mapa' }} />
       <Tab.Screen name="Settings" component={SettingsStackScreen} options={{ title: 'Config' }} />
     </Tab.Navigator>
   );
