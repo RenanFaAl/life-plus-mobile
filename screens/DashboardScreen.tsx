@@ -17,7 +17,6 @@ import {
   FileText,
   Plus,
   Upload,
-  UserPen,
   Clock
 } from 'lucide-react-native';
 
@@ -28,7 +27,11 @@ import * as dashboardService from '../services/dashboardService';
 
 export default function DashboardScreen({ navigation }: any) {
 
-  const { user, loading, fetchUser } = useUser();
+  const {
+    user,
+    loading,
+    fetchUser
+  } = useUser();
 
   const [dashboard, setDashboard] = useState<any>(null);
 
@@ -41,39 +44,94 @@ export default function DashboardScreen({ navigation }: any) {
     try {
 
       setDashboardLoading(true);
+
       const data =
         await dashboardService.getDashboard();
 
       setDashboard(data);
+
     } catch (error) {
+
       console.log(
         'Erro ao carregar dashboard:',
         error
       );
 
     } finally {
+
       setDashboardLoading(false);
+
     }
 
-  }
+  };
 
 
   useFocusEffect(
     useCallback(() => {
+
       fetchUser();
+
       loadDashboard();
+
     }, [])
-  )
+  );
+
+
+  const formatRelativeDate = (
+    dateString: string
+  ) => {
+
+    const date =
+      new Date(dateString);
+
+    const now =
+      new Date();
+
+    const diff =
+      now.getTime()
+      -
+      date.getTime();
+
+    const hours =
+      Math.floor(
+        diff / (1000 * 60 * 60)
+      );
+
+    const days =
+      Math.floor(hours / 24);
+
+    if (hours < 1) {
+      return 'Agora';
+    }
+
+    if (hours < 24) {
+
+      return `Há ${hours} hora${hours > 1 ? 's' : ''
+        }`;
+
+    }
+
+    if (days === 1) {
+      return 'Ontem';
+    }
+
+    return `Há ${days} dias`;
+
+  };
 
 
   const firstName =
-    user?.name?.split(' ')[0] || 'Usuário';
+    user?.name?.split(' ')[0]
+    ||
+    'Usuário';
+
 
   if (
     (loading && !user)
     ||
     dashboardLoading
   ) {
+
     return (
 
       <View
@@ -131,7 +189,7 @@ export default function DashboardScreen({ navigation }: any) {
       color: colors.primary
     }
 
-  ]
+  ];
 
 
   return (
@@ -142,13 +200,12 @@ export default function DashboardScreen({ navigation }: any) {
     >
 
       <View style={styles.content}>
-
         <Text style={styles.title}>
           Olá, {firstName}! 👋
         </Text>
 
         <Text style={styles.subtitle}>
-          Aqui está seu resumo
+          Aqui está seu resumo de saúde
         </Text>
 
 
@@ -156,7 +213,7 @@ export default function DashboardScreen({ navigation }: any) {
 
           {stats.map((s, i) => {
 
-            const Icon = s.icon
+            const Icon = s.icon;
 
             return (
 
@@ -185,16 +242,16 @@ export default function DashboardScreen({ navigation }: any) {
                   {s.label}
 
                 </Text>
+
               </View>
-
             )
-
           })}
-
         </View>
 
 
+
         <View style={styles.card}>
+
           <View style={styles.cardHeader}>
             <Clock
               size={18}
@@ -208,57 +265,85 @@ export default function DashboardScreen({ navigation }: any) {
 
 
           {
-            dashboard?.recentActivity?.map(
-              (a: any, i: number) => {
+            dashboard?.recentActivity?.length ? (
 
-                const Icon =
-                  a.type === "medication"
-                    ? Pill
-                    : FileText
+              dashboard.recentActivity.map(
+                (a: any, i: number) => {
+                  const Icon =
+                    a.type === "medication"
+                      ? Pill
+                      : FileText;
 
 
-                return (
-
-                  <View
-                    key={i}
-                    style={styles.activityRow}
-                  >
+                  return (
 
                     <View
-                      style={styles.activityIcon}
+                      key={i}
+                      style={styles.activityRow}
                     >
 
-                      <Icon
-                        size={16}
-                        color={colors.accent}
-                      />
+                      <View
+                        style={styles.activityIcon}
+                      >
+
+                        <Icon
+                          size={16}
+                          color={colors.accent}
+                        />
+
+                      </View>
+
+
+                      <View
+                        style={styles.activityText}
+                      >
+
+                        <Text
+                          style={styles.activityTitle}
+                        >
+
+                          {a.text}
+
+                        </Text>
+
+                        <Text
+                          style={styles.activityTime}
+                        >
+
+                          {
+                            formatRelativeDate(
+                              a.time
+                            )
+                          }
+
+                        </Text>
+
+                      </View>
 
                     </View>
 
-                    <View
-                      style={styles.activityText}
-                    >
+                  )
 
-                      <Text
-                        style={styles.activityTitle}
-                      >
+                })
 
-                        {a.text}
+            )
 
-                      </Text>
+              :
 
-                      <Text
-                        style={styles.activityTime}
-                      >
+              (
 
-                        {a.time}
+                <Text
+                  style={styles.activityTime}
+                >
 
-                      </Text>
-                    </View>
-                  </View>
-                )
-              })
+                  Nenhuma atividade recente
+
+                </Text>
+
+              )
+
           }
+
         </View>
 
 
@@ -287,9 +372,7 @@ export default function DashboardScreen({ navigation }: any) {
                   styles.actionBtnPrimaryText
                 }
               >
-
                 Adicionar Medicamento
-
               </Text>
             </TouchableOpacity>
 
@@ -344,7 +427,5 @@ const styles = StyleSheet.create({
   activityTime: { fontSize: 11, color: colors.textMuted },
   actionsCol: { gap: 10 },
   actionBtnPrimary: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.accent, paddingVertical: 12, paddingHorizontal: 16, borderRadius: 12 },
-  actionBtnPrimaryText: { color: colors.white, fontWeight: '600', fontSize: 14 },
-  actionBtnOutline: { flexDirection: 'row', alignItems: 'center', gap: 8, borderWidth: 1, borderColor: colors.border, paddingVertical: 12, paddingHorizontal: 16, borderRadius: 12 },
-  actionBtnOutlineText: { color: colors.text, fontWeight: '500', fontSize: 14 },
+  actionBtnPrimaryText: { color: colors.white, fontWeight: '600', fontSize: 14 }
 });
