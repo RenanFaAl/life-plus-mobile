@@ -141,24 +141,8 @@ export default function LoginScreen({ navigation }: any) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   scroll: { flexGrow: 1 },
-  topGradient: {
-    padding: 32,
-    paddingTop: 60,
-    alignItems: 'center',
-    position: 'relative'
-  },
-  backButton: {
-    position: 'absolute',
-    top: 60,
-    left: 20,
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 10
-  },
+  topGradient: { padding: 32, paddingTop: 60, alignItems: 'center', position: 'relative' },
+  backButton: { position: 'absolute', top: 60, left: 20, width: 40, height: 40, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center', zIndex: 10 },
   logoRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 16 },
   logoIcon: { width: 44, height: 44, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' },
   logoIconText: { color: colors.white, fontWeight: 'bold', fontSize: 16 },
