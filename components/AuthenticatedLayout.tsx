@@ -2,7 +2,7 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native'; 
-import { LayoutDashboard, User, FileText, Pill, Settings } from 'lucide-react-native';
+import { LayoutDashboard, User, FileText, Pill, Settings, Map } from 'lucide-react-native';
 import colors from '../theme/colors';
 
 import DashboardScreen from '../screens/DashboardScreen';

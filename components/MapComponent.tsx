@@ -1,4 +1,4 @@
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import {
   requestForegroundPermissionsAsync,
   getCurrentPositionAsync,
@@ -37,47 +37,63 @@ export default function MapComponent() {
     requestLocationPermission();
   }, []);
 
-  // Atualização contínua da localização
   useEffect(() => {
-    const subscription = watchPositionAsync(
-      {
-        accuracy: LocationAccuracy.Highest,
-        timeInterval: 3000,
-        distanceInterval: 5,
-      },
-      (response) => setLocation(response)
-    );
+    let subscription: any;
+
+    async function startWatching() {
+      const { granted } = await requestForegroundPermissionsAsync();
+
+      if (!granted) return;
+
+      subscription = await watchPositionAsync(
+        {
+          accuracy: LocationAccuracy.Highest,
+          timeInterval: 3000,
+          distanceInterval: 5,
+        },
+        (response) => setLocation(response)
+      );
+    }
+
+    startWatching();
 
     return () => {
-      subscription.then((sub) => sub.remove());
+      subscription?.remove();
     };
   }, []);
 
   // Procura de Farmácias
   useEffect(() => {
-    if (location && !hasFetched.current) {
-      hasFetched.current = true;
+    if (!location) return;
 
-      buscarFarmacias(
-        location.coords.latitude,
-        location.coords.longitude
-      )
-        .then((data) => {
-          console.log("Farmácias:", data);
+    const carregarFarmacias = async () => {
+      try {
+        const data = await buscarFarmacias(
+          location.coords.latitude,
+          location.coords.longitude
+        );
+        
+        console.log("Resposta da API do Google:", data);
+        
+        if (data) {
+          setFarmacias(data);
+        }
+      } catch (err) {
+        console.error("Erro real na requisição das farmácias:", err);
+      }
+    };
 
-          // Ajuste caso sua API retorne "results"
-          setFarmacias(data.results || data);
-        })
-        .catch((err) => console.error("Erro ao buscar farmácias:", err));
-    }
+    carregarFarmacias();
   }, [location]);
 
   if (!location) return null;
 
   return (
     <MapView
-      style={{ flex: 1 }}
-      region={{
+      style={{ flex: 1 }} 
+      provider={PROVIDER_GOOGLE}
+      showsUserLocation={true}
+      initialRegion={{
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
         latitudeDelta: 0.05,
@@ -95,16 +111,22 @@ export default function MapComponent() {
       />
 
       {/* Farmácias */}
-      {farmacias.map((f) => (
-        <Marker
-          key={f.place_id}
-          coordinate={{
-            latitude: f.geometry.location.lat,
-            longitude: f.geometry.location.lng,
-          }}
-          title={f.name}
-          pinColor="red"
-        />
+      {farmacias
+        .filter(
+          (f) =>
+            f.geometry?.location?.lat &&
+            f.geometry?.location?.lng
+        )
+        .map((f) => (
+          <Marker
+            key={f.place_id}
+            coordinate={{
+              latitude: Number(f.geometry.location.lat),
+              longitude: Number(f.geometry.location.lng),
+            }}
+            title={f.name}
+            pinColor="red"
+          />
       ))}
     </MapView>
   );
